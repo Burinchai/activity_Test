@@ -380,7 +380,23 @@ app.get('/login', (req, res) => {
     });
 });
 
-app.post('/reserve', jsonParser, function (req, res) {
+app.post('/api/reserve', (req, res) => {
+    const login_ID = req.body.login_ID; // Assuming stdID is sent in the request body
+    
+    // Insert reservation data into MySQL
+    const query = 'INSERT INTO manage (std_ID) VALUES (?)';
+    connection.query(query, login_ID, (err, results) => {
+      if (err) {
+        console.error('Error inserting reservation:', err);
+        res.status(500).json({ error: 'Error reserving activity' });
+        return;
+      }
+      console.log('Reservation successful');
+      res.status(200).json({ message: 'Reservation successful' });
+    });
+  });
+
+  app.post('/reserve', jsonParser, function (req, res) {
     const {man_status, std_ID, act_ID} = req.body;
     connect.query('INSERT INTO manage(`man_status`, `std_ID`, `act_ID`) VALUES (?, ?, ?)',
         [man_status, std_ID, act_ID],
@@ -398,6 +414,8 @@ app.post('/reserve', jsonParser, function (req, res) {
         }
     );
 });
+
+
 
 
 app.listen(3333, jsonParser, function () {
