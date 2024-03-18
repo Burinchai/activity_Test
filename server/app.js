@@ -162,7 +162,7 @@ app.post('/addusers', jsonParser, (req, res, next) => {
 
 // read ดึงข้อมูลของ users
 app.get('/api/user', (req, res) => {
-    connect.query('SELECT * FROM login', (err, results) => {
+    connect.query('SELECT * FROM student', (err, results) => {
         if (err) {
             console.error('Error querying MySQL:', err);
             res.status(500).send('Internal Server Error');
@@ -171,6 +171,8 @@ app.get('/api/user', (req, res) => {
         res.json(results);
     });
 });
+
+
 
 // update 
 
@@ -263,10 +265,9 @@ app.post('/activity', jsonParser, function (req, res) {
 
 
 
-app.post('/reserve', jsonParser, function (req, res) {
-    const {man_status, std_ID, act_ID} = req.body;
-    connect.query('INSERT INTO manage(`man_status`, `std_ID`, `act_ID`) VALUES (?, ?, ?)',
-        [man_status, std_ID, act_ID],
+app.post('/actcode', jsonParser, function (req, res) {
+    connect.query('INSERT INTO actcode(`act_Code`, `act_Name`) VALUES (?,?)',
+        [req.body.actCode, req.body.actName],
         function (err, results) {
             if (err) {
                 console.error('Error inserting into database:', err);
@@ -274,9 +275,7 @@ app.post('/reserve', jsonParser, function (req, res) {
                     error: 'Internal Server Error'
                 });
             } else {
-                res.json({
-                    status: 'ok'
-                });
+                res.json(results);
             }
         }
     );
@@ -350,6 +349,54 @@ app.post('/add_activity', (req, res) => {
             });
         }
     });
+});
+
+app.get('/getStudent', (req,res) => {
+    connect.query('SELECT * FROM `student` ', (err,results) => {
+        if (err) {
+            console.log(err)
+            res.status(500).send('Internal Server Error')
+            return
+        }
+        res.json(results)
+    })
+})
+
+app.get('/getManage', (req, res) => {
+    connect.query('SELECT * FROM manage ', (err, results) => {
+        if (err) {
+            console.error('Error querying MySQL:', err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+        res.json(results);
+    });
+});
+
+app.get('/login', (req, res) => {
+    connection.query('SELECT * FROM login', (error, results, fields) => {
+      if (error) throw error;
+      res.json(results);
+    });
+});
+
+app.post('/reserve', jsonParser, function (req, res) {
+    const {man_status, std_ID, act_ID} = req.body;
+    connect.query('INSERT INTO manage(`man_status`, `std_ID`, `act_ID`) VALUES (?, ?, ?)',
+        [man_status, std_ID, act_ID],
+        function (err, results) {
+            if (err) {
+                console.error('Error inserting into database:', err);
+                res.status(500).json({
+                    error: 'Internal Server Error'
+                });
+            } else {
+                res.json({
+                    status: 'ok'
+                });
+            }
+        }
+    );
 });
 
 
